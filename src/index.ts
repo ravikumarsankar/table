@@ -57,6 +57,8 @@ import { CopyData } from './data/copy';
 import { EventEmitter } from './event';
 import TextEditor from './editor/text';
 
+import FParser from './fParser';
+
 export type TableRendererOptions = {
   style?: Partial<Style>;
   headerStyle?: Partial<Style>;
@@ -575,6 +577,48 @@ function resizeContentRect(t: Table) {
     height: rowsHeight(t._data),
   };
 }
+class FormulaTable {
+  private data: number[][];
+  private formulas: (string | null)[][];
+  private formulaParser: FParser;
+
+  constructor(rows: number, cols: number) {
+    this.data = Array(rows)
+      .fill(null)
+      .map(() => Array(cols).fill(0));
+    this.formulas = Array(rows)
+      .fill(null)
+      .map(() => Array(cols).fill(null));
+    this.formulaParser = new FParser(this);
+  }
+
+  setCell(row: number, col: number, value: number): void {
+    this.data[row][col] = value;
+  }
+
+  getCell(row: number, col: number): number {
+    return this.data[row][col];
+  }
+
+  setCellFormula(row: number, col: number, formula: string): void {
+    this.formulas[row][col] = formula;
+    const result = this.formulaParser.parse(formula);
+    this.setCell(row, col, result);
+  }
+
+  recalculate(): void {
+    for (let row = 0; row < this.data.length; row++) {
+      for (let col = 0; col < this.data[row].length; col++) {
+        if (this.formulas[row][col]) {
+          const result = this.formulaParser.parse(this.formulas[row][col]!);
+          this.setCell(row, col, result);
+        }
+      }
+    }
+  }
+}
+
+export { FormulaTable };
 
 declare global {
   interface Window {

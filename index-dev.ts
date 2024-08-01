@@ -1,4 +1,4 @@
-import WolfTable, { h } from './src';
+import WolfTable, { FormulaTable, h } from './src';
 
 const t = WolfTable.create(
   '#table',
@@ -31,7 +31,7 @@ const t = WolfTable.create(
     cells: [
       [0, 0, 'abc'],
       [1, 1, 100],
-      [2, 6, { value: 'formua', style: 0 }],
+      [2, 6, { value: 'formula', style: 0 }],
       [9, 5, { value: '', formula: '=sum(A1:A10)' }],
     ],
   })
@@ -76,3 +76,32 @@ t.render();
 
 // get cell
 console.log('cell[2,2]:', t.cell(2, 2));
+
+const table = new FormulaTable(5, 5);
+
+// Set some initial values
+table.setCell(0, 0, 10); // A1 = 10
+table.setCell(0, 1, 20); // B1 = 20
+table.setCell(1, 0, 30); // A2 = 30
+
+// Set formulas
+table.setCellFormula(2, 0, '=A1+B1'); // A3 = A1 + B1
+table.setCellFormula(2, 1, '=A1*A2'); // B3 = A1 * A2
+table.setCellFormula(3, 0, '=A3+B3'); // A4 = A3 + B3
+
+// Print the table
+for (let i = 0; i < 5; i++) {
+  console.log(table['data'][i].slice(0, 5).join('\t'));
+}
+
+// Change a cell value
+table.setCell(0, 0, 15); // A1 = 15
+
+// Recalculate
+table.recalculate();
+
+// Print the updated table
+console.log('\nAfter changing A1 to 15:');
+for (let i = 0; i < 5; i++) {
+  console.log(table['data'][i].slice(0, 5).join('\t'));
+}
