@@ -619,6 +619,7 @@ export default class Table {
 
     console.log('Setting formula:', formula, result);
     this._cdata[row][col] = result;
+    this.cell(row, col, result);
   }
 
   recalculate(): void {
