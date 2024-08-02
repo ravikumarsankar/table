@@ -33,6 +33,7 @@ const table = WolfTable.create(
       [1, 1, 100],
       [2, 6, { value: 'formula', style: 0 }],
       [9, 5, { formula: '=sum(A1:A10)' }],
+      [11, 1, 100],
     ],
   })
   .onClick((cell, evt) => {

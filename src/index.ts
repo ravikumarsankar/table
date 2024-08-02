@@ -481,6 +481,25 @@ export default class Table {
       });
       scrollbar.resize(this);
     }
+    this.bloatCellData();
+    return this;
+  }
+
+  data(): TableData;
+  data(data: Partial<TableData>): Table;
+  data(data?: any): any {
+    if (data) {
+      Object.assign(this._data, data);
+      this._cells.load(this._data);
+      this.bloatCellData(this._data);
+      resizeContentRect(this);
+      return this;
+    } else {
+      return this._data;
+    }
+  }
+
+  bloatCellData(data?: TableData) {
     if (this._cdata.length == 0) {
       for (let row = 0; row < this._data.rows.len; row++) {
         this._cdata[row] = [];
@@ -491,20 +510,14 @@ export default class Table {
         }
       }
     }
-    console.log(this._cdata);
-    return this;
-  }
-
-  data(): TableData;
-  data(data: Partial<TableData>): Table;
-  data(data?: any): any {
-    if (data) {
-      Object.assign(this._data, data);
-      this._cells.load(this._data);
-      resizeContentRect(this);
-      return this;
-    } else {
-      return this._data;
+    if (data?.cells) {
+      for (let cellId = 0; cellId < data.cells.length; cellId++) {
+        this.cell(
+          data.cells[cellId][0],
+          data.cells[cellId][1],
+          data.cells[cellId][2]
+        );
+      }
     }
   }
 
