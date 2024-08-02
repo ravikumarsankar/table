@@ -1,9 +1,12 @@
 import Table from '.';
 
 type Operator = '+' | '-' | '*' | '/';
+type ExcelFunction = 'SUM' | 'AVERAGE' | 'MIN' | 'MAX' | 'COUNT';
+
 class FParser {
   private table: Table;
   private operators: Record<Operator, (a: number, b: number) => number>;
+  private excelFunctions: Record<ExcelFunction, (args: number[]) => number>;
 
   constructor(table: Table) {
     this.table = table;
@@ -12,6 +15,13 @@ class FParser {
       '-': (a, b) => a - b,
       '*': (a, b) => a * b,
       '/': (a, b) => a / b,
+    };
+    this.excelFunctions = {
+      SUM: (args) => args.reduce((sum, val) => sum + val, 0),
+      AVERAGE: (args) => args.reduce((sum, val) => sum + val, 0) / args.length,
+      MIN: (args) => Math.min(...args),
+      MAX: (args) => Math.max(...args),
+      COUNT: (args) => args.length,
     };
   }
 
@@ -31,17 +41,23 @@ class FParser {
   }
 
   private tokenize(expression: string): string[] {
-    return expression.match(/([A-Z]+[0-9]+|\d+|\+|\-|\*|\/|\(|\))/g) || [];
+    return (
+      expression.match(
+        /([A-Z]+[0-9]+|\d+|\+|\-|\*|\/|\(|\)|,|[A-Z]+(?=\())/g
+      ) || []
+    );
   }
 
   private infixToPostfix(tokens: string[]): string[] {
     const output: string[] = [];
     const stack: string[] = [];
-    const precedence: Record<Operator, number> = {
+    const precedence: Record<Operator | '(' | ')', number> = {
       '+': 1,
       '-': 1,
       '*': 2,
       '/': 2,
+      '(': 0,
+      ')': 0,
     };
 
     for (const token of tokens) {
@@ -56,6 +72,8 @@ class FParser {
           output.push(stack.pop()!);
         }
         stack.push(token);
+      } else if (token in this.excelFunctions) {
+        stack.push(token);
       } else if (token === '(') {
         stack.push(token);
       } else if (token === ')') {
@@ -63,6 +81,13 @@ class FParser {
           output.push(stack.pop()!);
         }
         stack.pop(); // Remove '('
+        if (stack.length && stack[stack.length - 1] in this.excelFunctions) {
+          output.push(stack.pop()!);
+        }
+      } else if (token === ',') {
+        while (stack.length && stack[stack.length - 1] !== '(') {
+          output.push(stack.pop()!);
+        }
       }
     }
 
@@ -81,10 +106,16 @@ class FParser {
         stack.push(this.getCellValue(token));
       } else if (!isNaN(Number(token))) {
         stack.push(parseFloat(token));
-      } else {
+      } else if (token in this.operators) {
         const b = stack.pop()!;
         const a = stack.pop()!;
         stack.push(this.operators[token as Operator](a, b));
+      } else if (token in this.excelFunctions) {
+        const args: number[] = [];
+        while (stack.length && typeof stack[stack.length - 1] === 'number') {
+          args.unshift(stack.pop() as number);
+        }
+        stack.push(this.excelFunctions[token as ExcelFunction](args));
       }
     }
     return stack[0];
