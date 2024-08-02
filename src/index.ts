@@ -115,8 +115,6 @@ export default class Table {
 
   _data: TableData;
 
-  _editor: TextEditor;
-
   _renderer: TableRenderer;
 
   _cells = new Cells();
