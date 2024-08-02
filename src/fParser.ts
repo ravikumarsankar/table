@@ -43,7 +43,7 @@ class FParser {
   private tokenize(expression: string): string[] {
     return (
       expression.match(
-        /([A-Z]+[0-9]+|\d+|\+|\-|\*|\/|\(|\)|,|[A-Z]+(?=\())/g
+        /([A-Z]+[0-9]+(?::[A-Z]+[0-9]+)?|\d+|\+|\-|\*|\/|\(|\)|,|:|[A-Z]+(?=\())/g
       ) || []
     );
   }
@@ -51,23 +51,28 @@ class FParser {
   private infixToPostfix(tokens: string[]): string[] {
     const output: string[] = [];
     const stack: string[] = [];
-    const precedence: Record<Operator | '(' | ')', number> = {
+    const precedence: Record<Operator | '(' | ')' | ':', number> = {
       '+': 1,
       '-': 1,
       '*': 2,
       '/': 2,
       '(': 0,
       ')': 0,
+      ':': 3,
     };
 
     for (const token of tokens) {
-      if (this.isCellReference(token) || !isNaN(Number(token))) {
+      if (
+        this.isCellReference(token) ||
+        this.isCellRange(token) ||
+        !isNaN(Number(token))
+      ) {
         output.push(token);
-      } else if (token in this.operators) {
+      } else if (token in this.operators || token === ':') {
         while (
           stack.length &&
-          precedence[stack[stack.length - 1] as Operator] >=
-            precedence[token as Operator]
+          precedence[stack[stack.length - 1] as Operator | ':'] >=
+            precedence[token as Operator | ':']
         ) {
           output.push(stack.pop()!);
         }
@@ -99,36 +104,79 @@ class FParser {
   }
 
   private evaluatePostfix(postfix: string[]): number {
-    const stack: number[] = [];
+    const stack: (number | number[])[] = [];
 
     for (const token of postfix) {
       if (this.isCellReference(token)) {
         stack.push(this.getCellValue(token));
+      } else if (this.isCellRange(token)) {
+        stack.push(this.getCellRangeValues(token));
       } else if (!isNaN(Number(token))) {
         stack.push(parseFloat(token));
       } else if (token in this.operators) {
-        const b = stack.pop()!;
-        const a = stack.pop()!;
+        const b = stack.pop() as number;
+        const a = stack.pop() as number;
         stack.push(this.operators[token as Operator](a, b));
+      } else if (token === ':') {
+        const end = stack.pop() as number;
+        const start = stack.pop() as number;
+        stack.push(this.getRange(start, end));
       } else if (token in this.excelFunctions) {
         const args: number[] = [];
-        while (stack.length && typeof stack[stack.length - 1] === 'number') {
-          args.unshift(stack.pop() as number);
+        while (
+          stack.length &&
+          (typeof stack[stack.length - 1] === 'number' ||
+            Array.isArray(stack[stack.length - 1]))
+        ) {
+          const value = stack.pop()!;
+          if (Array.isArray(value)) {
+            args.unshift(...value);
+          } else {
+            args.unshift(value);
+          }
         }
         stack.push(this.excelFunctions[token as ExcelFunction](args));
       }
     }
-    return stack[0];
+    return stack[0] as number;
   }
 
   private isCellReference(token: string): boolean {
     return /^[A-Z]+[0-9]+$/.test(token);
   }
 
+  private isCellRange(token: string): boolean {
+    return /^[A-Z]+[0-9]+:[A-Z]+[0-9]+$/.test(token);
+  }
+
   private getCellValue(cellRef: string): number {
     const col = this.letterToColumn(cellRef.match(/^[A-Z]+/)![0]);
     const row = parseInt(cellRef.match(/[0-9]+$/)![0]) - 1;
     return this.table.getCell(row, col);
+  }
+
+  private getCellRangeValues(range: string): number[] {
+    const [start, end] = range.split(':');
+    const startCol = this.letterToColumn(start.match(/^[A-Z]+/)![0]);
+    const startRow = parseInt(start.match(/[0-9]+$/)![0]) - 1;
+    const endCol = this.letterToColumn(end.match(/^[A-Z]+/)![0]);
+    const endRow = parseInt(end.match(/[0-9]+$/)![0]) - 1;
+
+    const values: number[] = [];
+    for (let row = startRow; row <= endRow; row++) {
+      for (let col = startCol; col <= endCol; col++) {
+        values.push(this.table.getCell(row, col));
+      }
+    }
+    return values;
+  }
+
+  private getRange(start: number, end: number): number[] {
+    const range: number[] = [];
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+    return range;
   }
 
   private letterToColumn(letters: string): number {
