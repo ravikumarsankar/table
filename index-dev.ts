@@ -31,8 +31,8 @@ const table = WolfTable.create(
     cells: [
       [0, 0, 'abc'],
       [1, 1, 100],
-      [2, 6, { value: 'formula', style: 0 }],
-      [9, 5, { value: '', formula: '=sum(A1:A10)' }],
+      [2, 6, { value: '=formula', style: 0 }],
+      [9, 5, { formula: '=sum(A1:A10)' }],
     ],
   })
   .onClick((cell, evt) => {
@@ -63,10 +63,10 @@ const si = table.addStyle({
   color: '#1b1c1d',
 });
 // set cell
-table.cell(2, 2, { value: 'set-value', style: si });
+table.cell(2, 2, { value: '=set-value', style: si });
 table.cell(15, 7, {
   type: 'text',
-  value: 'option',
+  value: '=option',
   options: async (q) =>
     ['option1', 'option2', 'option3', 'option4', 'option5', 'option6'].filter(
       (it) => it.startsWith(q)

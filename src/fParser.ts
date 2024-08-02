@@ -87,7 +87,6 @@ class FParser {
         stack.push(this.operators[token as Operator](a, b));
       }
     }
-
     return stack[0];
   }
 

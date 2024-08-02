@@ -226,7 +226,7 @@ export default class Table {
     initEvents(this);
 
     this.onEditorValueChange((cell, value: DataCell) => {
-      console.log(`Cell (${cell.row}, ${cell.col}) changed to:`, value);
+      //console.log(`Cell (${cell.row}, ${cell.col}) changed to:`, value);
 
       // Update the cell
       if (value) this.setCell(cell.row, cell.col, value as DataCell);
@@ -243,7 +243,6 @@ export default class Table {
   }
 
   _handleEditorValueChange(row: number, col: number, value: DataCell) {
-    console.log('handle editor value change', row, col, value);
     this._emitter.emit('editorValueChange', { row, col }, value);
   }
 
@@ -600,16 +599,11 @@ export default class Table {
   }
 
   setCell(row: number, col: number, value: DataCell): void {
-    if (typeof value === 'string' && value.startsWith('=')) {
-      console.log('Setting value:', value);
-      this.setCellFormula(row, col, value);
-    } else if (typeof value === 'number') {
+    if (typeof value === 'number') {
       this._cdata[row][col] = value;
       this._formulas[row][col] = null;
-    } else {
-      throw new Error(
-        'Invalid cell value. Must be a number or a formula starting with "="'
-      );
+    } else if (typeof value === 'string' && value.startsWith('=')) {
+      this.setCellFormula(row, col, value);
     }
   }
 
@@ -623,8 +617,9 @@ export default class Table {
 
   setCellFormula(row: number, col: number, formula: string): void {
     this._formulas[row][col] = formula;
-    //console.log('Setting formula:', formula);
     const result = this._formulaParser.parse(formula);
+
+    console.log('Setting formula:', formula, result);
     this._cdata[row][col] = result;
   }
 
