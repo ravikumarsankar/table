@@ -1,11 +1,11 @@
-import { FormulaTable } from '.';
+import Table from '.';
 
 type Operator = '+' | '-' | '*' | '/';
 class FParser {
-  private table: FormulaTable;
+  private table: Table;
   private operators: Record<Operator, (a: number, b: number) => number>;
 
-  constructor(table: FormulaTable) {
+  constructor(table: Table) {
     this.table = table;
     this.operators = {
       '+': (a, b) => a + b,

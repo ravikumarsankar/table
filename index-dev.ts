@@ -1,6 +1,6 @@
-import WolfTable, { FormulaTable, h } from './src';
+import WolfTable, { h } from './src';
 
-const t = WolfTable.create(
+const table = WolfTable.create(
   '#table',
   () => 1400,
   () => 600,
@@ -36,10 +36,10 @@ const t = WolfTable.create(
     ],
   })
   .onClick((cell, evt) => {
-    // //console.log('cell:', cell, evt);
+    // console.log('cell:', cell, evt);
   })
   .onContextmenu((cell, evt) => {
-    //console.log('contetmenu:', cell);
+    console.log('contetmenu:', cell);
     const { x, y, width, height } = cell;
     const content = h('div')
       .css({ background: '#ddd', padding: '10px', 'z-index': '100' })
@@ -51,20 +51,20 @@ const t = WolfTable.create(
         position: 'absolute',
       });
     content.html('---abc--');
-    t.container().append(content);
+    table.container().append(content);
   })
   .render();
 
 // add style
-const si = t.addStyle({
+const si = table.addStyle({
   bold: true,
   italic: true,
   underline: true,
   color: '#1b1c1d',
 });
 // set cell
-t.cell(2, 2, { value: 'set-value', style: si });
-t.cell(15, 7, {
+table.cell(2, 2, { value: 'set-value', style: si });
+table.cell(15, 7, {
   type: 'text',
   value: 'option',
   options: async (q) =>
@@ -72,12 +72,10 @@ t.cell(15, 7, {
       (it) => it.startsWith(q)
     ),
 });
-t.render();
+table.render();
 
 // get cell
-//console.log('cell[2,2]:', t.cell(2, 2));
-
-let table = new FormulaTable(5, 5);
+console.log('cell[2,2]:', table.cell(2, 2));
 
 // Set some initial values
 table.setCell(0, 0, 10); // A1 = 10
@@ -89,11 +87,6 @@ table.setCellFormula(2, 0, '=A1+B1'); // A3 = A1 + B1
 table.setCellFormula(2, 1, '=A1*A2'); // B3 = A1 * A2
 table.setCellFormula(3, 0, '=A3+B3'); // A4 = A3 + B3
 
-// Print the table
-for (let i = 0; i < 5; i++) {
-  //console.log(table['data'][i].slice(0, 5).join('\t'));
-}
-
 // Change a cell value
 table.setCell(0, 0, 15); // A1 = 15
 
@@ -101,11 +94,7 @@ table.setCell(0, 0, 15); // A1 = 15
 table.recalculate();
 
 // Print the updated table
-//console.log('\nAfter changing A1 to 15:');
-for (let i = 0; i < 5; i++) {
-  //console.log(table['data'][i].slice(0, 5).join('\t'));
-}
-
+console.log('\nAfter changing A1 to 15:');
 // Set some initial values
 table.setCell(0, 0, 10);
 table.setCell(1, 1, 20);
@@ -115,4 +104,4 @@ table.selectCell(0, 0); // Select A1
 table.selectCell(1, 1); // Select B2
 table.createFormulaFromSelection(2, 2, '+'); // Set C3 to =A1+B2
 
-//console.log(table.getCell(2, 2)); // Output: 30
+console.log(table.getCell(2, 2)); // Output: 30
