@@ -31,7 +31,7 @@ const table = WolfTable.create(
     cells: [
       [0, 0, 'abc'],
       [1, 1, 100],
-      [2, 6, { value: '=formula', style: 0 }],
+      [2, 6, { value: 'formula', style: 0 }],
       [9, 5, { formula: '=sum(A1:A10)' }],
     ],
   })
@@ -63,10 +63,10 @@ const si = table.addStyle({
   color: '#1b1c1d',
 });
 // set cell
-table.cell(2, 2, { value: '=set-value', style: si });
+table.cell(2, 2, { value: 'set-value', style: si });
 table.cell(15, 7, {
   type: 'text',
-  value: '=option',
+  value: 'option',
   options: async (q) =>
     ['option1', 'option2', 'option3', 'option4', 'option5', 'option6'].filter(
       (it) => it.startsWith(q)
@@ -78,9 +78,9 @@ table.render();
 console.log('cell[2,2]:', table.cell(2, 2));
 
 // Set some initial values
-table.setCell(0, 0, 10); // A1 = 10
-table.setCell(0, 1, 20); // B1 = 20
-table.setCell(1, 0, 30); // A2 = 30
+table.cell(0, 0, 10); // A1 = 10
+table.cell(0, 1, 20); // B1 = 20
+table.cell(1, 0, 30); // A2 = 30
 
 // Set formulas
 table.setCellFormula(2, 0, '=A1+B1'); // A3 = A1 + B1
@@ -88,20 +88,20 @@ table.setCellFormula(2, 1, '=A1*A2'); // B3 = A1 * A2
 table.setCellFormula(3, 0, '=A3+B3'); // A4 = A3 + B3
 
 // Change a cell value
-table.setCell(0, 0, 15); // A1 = 15
+table.cell(0, 0, 15); // A1 = 15
 
 // Recalculate
-table.recalculate();
+//table.recalculate();
 
 // Print the updated table
 console.log('\nAfter changing A1 to 15:');
 // Set some initial values
-table.setCell(0, 0, 10);
-table.setCell(1, 1, 20);
+table.cell(0, 0, 10);
+table.cell(1, 1, 20);
 
 // Select cells and create a formula
 table.selectCell(0, 0); // Select A1
 table.selectCell(1, 1); // Select B2
 table.createFormulaFromSelection(2, 2, '+'); // Set C3 to =A1+B2
-
+table.render();
 console.log(table.getCell(2, 2)); // Output: 30

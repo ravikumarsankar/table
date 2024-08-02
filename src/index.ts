@@ -227,9 +227,10 @@ export default class Table {
 
     this.onEditorValueChange((cell, value: DataCell) => {
       //console.log(`Cell (${cell.row}, ${cell.col}) changed to:`, value);
-
-      // Update the cell
-      if (value) this.setCell(cell.row, cell.col, value as DataCell);
+      // assign the cell formula
+      if (typeof value === 'string' && value.startsWith('=')) {
+        this.setCellFormula(cell.row, cell.col, value);
+      }
       this.recalculate();
       this.render();
     });
@@ -424,6 +425,9 @@ export default class Table {
     if (value) {
       const oldValue = _cells.get(row, col);
       _cells.set(row, col, value);
+      if (typeof value === 'number') {
+        this._cdata[row][col] = value;
+      }
       // Trigger _handleEditorValueChange if the value has changed
       if (oldValue !== value) {
         this._handleEditorValueChange(row, col, value);
@@ -449,14 +453,6 @@ export default class Table {
       if (propValue) (_renderer as any)[prop](propValue);
     }
 
-    for (let row = 0; row < this._data.rows.len; row++) {
-      this._cdata[row] = [];
-      this._formulas[row] = [];
-      for (let col = 0; col < this._data.cols.len; col++) {
-        this._cdata[row][col] = this.getCell(row, col);
-        this._formulas[row][col] = this.getCellFormula(row, col);
-      }
-    }
     _renderer
       .scrollRows(_data.scroll[0])
       .scrollCols(_data.scroll[1])
@@ -485,6 +481,17 @@ export default class Table {
       });
       scrollbar.resize(this);
     }
+    if (this._cdata.length == 0) {
+      for (let row = 0; row < this._data.rows.len; row++) {
+        this._cdata[row] = [];
+        this._formulas[row] = [];
+        for (let col = 0; col < this._data.cols.len; col++) {
+          this._cdata[row][col] = this.getCell(row, col);
+          this._formulas[row][col] = this.getCellFormula(row, col);
+        }
+      }
+    }
+    console.log(this._cdata);
     return this;
   }
 
@@ -596,15 +603,6 @@ export default class Table {
   onContextmenu(handler: (cell: ViewportCell, evt: MouseEvent) => void) {
     this._emitter.on('contextmenu', handler);
     return this;
-  }
-
-  setCell(row: number, col: number, value: DataCell): void {
-    if (typeof value === 'number') {
-      this._cdata[row][col] = value;
-      this._formulas[row][col] = null;
-    } else if (typeof value === 'string' && value.startsWith('=')) {
-      this.setCellFormula(row, col, value);
-    }
   }
 
   getCell(row: number, col: number): number {
