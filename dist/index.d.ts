@@ -1,5 +1,5 @@
 import './style.index.less';
-import HElement from './element';
+import HElement, { h } from './element';
 import Scrollbar from './scrollbar';
 import Resizer from './resizer';
 import Selector from './selector';
@@ -8,6 +8,7 @@ import Editor from './editor';
 import TableRenderer, { Style, ColHeader, RowHeader, Range, Rect, Border, Formatter, Gridline, ViewportCell } from '@wolf-table/table-renderer';
 import { TableData, Cells, FormulaParser, DataCell, DataRow, DataCol, DataCellValue } from './data';
 import { EventEmitter } from './event';
+import FParser from './fParser';
 export declare type TableRendererOptions = {
     style?: Partial<Style>;
     headerStyle?: Partial<Style>;
@@ -35,7 +36,7 @@ export declare type TableOptions = {
     renderer?: TableRendererOptions;
 };
 export declare type MoveDirection = 'up' | 'down' | 'left' | 'right';
-export declare type EventName = 'click';
+export { HElement, h };
 export default class Table {
     _rendererOptions: TableRendererOptions;
     _copyable: boolean;
@@ -59,7 +60,19 @@ export default class Table {
     _overlayer: Overlayer;
     _canvas: HElement;
     _emitter: EventEmitter;
+    _cdata: number[][];
+    _formulas: (string | null)[][];
+    _formulaParser: FParser;
+    _selectedCells: {
+        row: number;
+        col: number;
+    }[];
     constructor(element: HTMLElement | string, width: () => number, height: () => number, options?: TableOptions);
+    onEditorValueChange(handler: (cell: {
+        row: number;
+        col: number;
+    }, value: DataCell) => void): this;
+    _handleEditorValueChange(row: number, col: number, value: DataCell): void;
     contentRect(): Rect;
     container(): HElement;
     resize(): void;
@@ -97,6 +110,7 @@ export default class Table {
     render(): this;
     data(): TableData;
     data(data: Partial<TableData>): Table;
+    bloatCellData(data?: TableData): void;
     /**
      * copy data to ...
      * @param to
@@ -117,6 +131,20 @@ export default class Table {
     toHtml(from: string): string;
     toArrays(from: string): DataCellValue[][];
     onClick(handler: (cell: ViewportCell, evt: MouseEvent) => void): this;
+    onContextmenu(handler: (cell: ViewportCell, evt: MouseEvent) => void): this;
+    getCell(row: number, col: number): number;
+    getCellFormula(row: number, col: number): string | null;
+    setCellFormula(row: number, col: number, formula: string): void;
+    recalculate(): void;
+    selectCell(row: number, col: number): void;
+    clearSelection(): void;
+    createFormulaFromSelection(targetRow: number, targetCol: number, operator: '+' | '-' | '*' | '/'): void;
+    columnToLetter(column: number): string;
+    cellRefToIndices(cellRef: string): {
+        row: number;
+        col: number;
+    };
+    letterToColumn(letters: string): number;
     /**
      * @param type keyof cell.type
      * @param editor

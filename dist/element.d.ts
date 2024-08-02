@@ -4,6 +4,7 @@ export declare type CSSAttrs = {
     width?: number;
     height?: number;
     position?: string;
+    [property: string]: any;
 };
 export default class HElement {
     _: HTMLElement;
