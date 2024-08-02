@@ -1,11 +1,12 @@
 import HElement, { h } from '../element';
 import { borderWidth } from '../config';
 import { Rect } from '@wolf-table/table-renderer';
-import { DataCell } from '../data';
+import { DataCell, IndexDataCell } from '../data';
 
 type MoveDirection = 'up' | 'down' | 'left' | 'right' | 'none';
 type MoveChanger = (direction: MoveDirection) => void;
 type Changer = (value: DataCell) => void;
+type ChangeListener = (value: DataCell) => void;
 
 /**
  * new -> cellIndex -> rect -> target -> hide
@@ -16,9 +17,11 @@ export default class Editor {
   _rect: Rect | null = null;
   _value: DataCell;
   _visible: boolean = false;
-
+  _rowIndex: number = 0;
+  _colIndex: number = 0;
   _moveChanger: MoveChanger = () => {};
   _changer: Changer = () => {};
+  _changeListener: ChangeListener = () => {};
 
   constructor(cssClass: String) {
     this._ = h('div', cssClass);
@@ -34,17 +37,27 @@ export default class Editor {
     return this;
   }
 
-  cellIndex(r: number, c: number) {
+  cellIndex(r?: number, c?: number) {
     return this;
   }
 
-  value(v: DataCell) {
+  row() {
+    return this._rowIndex;
+  }
+
+  col() {
+    return this._colIndex;
+  }
+
+  value(v: DataCell, iv?: IndexDataCell) {
     this._value = v;
+    console.log(iv);
     return this;
   }
 
   changed() {
     this._changer(this._value);
+    this._changeListener(this._rect ? this._value : null);
     this.hide();
   }
 
@@ -82,6 +95,11 @@ export default class Editor {
 
   changer(value: Changer) {
     this._changer = value;
+    return this;
+  }
+
+  changeListener(value: Changer) {
+    this._changeListener = value;
     return this;
   }
 }

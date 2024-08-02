@@ -36,10 +36,10 @@ const t = WolfTable.create(
     ],
   })
   .onClick((cell, evt) => {
-    // console.log('cell:', cell, evt);
+    // //console.log('cell:', cell, evt);
   })
   .onContextmenu((cell, evt) => {
-    console.log('contetmenu:', cell);
+    //console.log('contetmenu:', cell);
     const { x, y, width, height } = cell;
     const content = h('div')
       .css({ background: '#ddd', padding: '10px', 'z-index': '100' })
@@ -75,9 +75,9 @@ t.cell(15, 7, {
 t.render();
 
 // get cell
-console.log('cell[2,2]:', t.cell(2, 2));
+//console.log('cell[2,2]:', t.cell(2, 2));
 
-const table = new FormulaTable(5, 5);
+let table = new FormulaTable(5, 5);
 
 // Set some initial values
 table.setCell(0, 0, 10); // A1 = 10
@@ -91,7 +91,7 @@ table.setCellFormula(3, 0, '=A3+B3'); // A4 = A3 + B3
 
 // Print the table
 for (let i = 0; i < 5; i++) {
-  console.log(table['data'][i].slice(0, 5).join('\t'));
+  //console.log(table['data'][i].slice(0, 5).join('\t'));
 }
 
 // Change a cell value
@@ -101,7 +101,18 @@ table.setCell(0, 0, 15); // A1 = 15
 table.recalculate();
 
 // Print the updated table
-console.log('\nAfter changing A1 to 15:');
+//console.log('\nAfter changing A1 to 15:');
 for (let i = 0; i < 5; i++) {
-  console.log(table['data'][i].slice(0, 5).join('\t'));
+  //console.log(table['data'][i].slice(0, 5).join('\t'));
 }
+
+// Set some initial values
+table.setCell(0, 0, 10);
+table.setCell(1, 1, 20);
+
+// Select cells and create a formula
+table.selectCell(0, 0); // Select A1
+table.selectCell(1, 1); // Select B2
+table.createFormulaFromSelection(2, 2, '+'); // Set C3 to =A1+B2
+
+//console.log(table.getCell(2, 2)); // Output: 30

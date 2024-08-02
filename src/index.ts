@@ -115,6 +115,8 @@ export default class Table {
 
   _data: TableData;
 
+  _editor: TextEditor;
+
   _renderer: TableRenderer;
 
   _cells = new Cells();
@@ -155,7 +157,6 @@ export default class Table {
       width: width(),
     });
     this._data = defaultData();
-
     // update default data
     if (options) {
       const { minColWidth, minRowHeight, renderer, data } = options;
@@ -205,10 +206,35 @@ export default class Table {
 
     this._copyable = options?.copyable || false;
 
-    // set editors
-    this._editors.set('text', new TextEditor());
+    this._editor = new TextEditor();
 
+    // set editors
+    this._editors.set('text', this._editor);
+
+    if (this._editor) {
+      this._editor.changeListener((value: DataCell) => {
+        const editorCell = this._editor!.cellIndex();
+        if (editorCell._value) {
+          this._handleEditorValueChange(
+            editorCell.row(),
+            editorCell.col(),
+            value
+          );
+        }
+      });
+    }
     initEvents(this);
+  }
+
+  onEditorValueChange(
+    handler: (cell: { row: number; col: number }, value: DataCell) => void
+  ) {
+    this._emitter.on('editorValueChange', handler);
+    return this;
+  }
+
+  _handleEditorValueChange(row: number, col: number, value: DataCell) {
+    this._emitter.emit('editorValueChange', { row, col }, value);
   }
 
   contentRect() {
@@ -577,10 +603,12 @@ function resizeContentRect(t: Table) {
     height: rowsHeight(t._data),
   };
 }
+
 class FormulaTable {
   private data: number[][];
   private formulas: (string | null)[][];
   private formulaParser: FParser;
+  private selectedCells: { row: number; col: number }[];
 
   constructor(rows: number, cols: number) {
     this.data = Array(rows)
@@ -590,20 +618,36 @@ class FormulaTable {
       .fill(null)
       .map(() => Array(cols).fill(null));
     this.formulaParser = new FParser(this);
+    this.selectedCells = [];
   }
 
-  setCell(row: number, col: number, value: number): void {
-    this.data[row][col] = value;
+  setCell(row: number, col: number, value: number | string): void {
+    if (typeof value === 'string' && value.startsWith('=')) {
+      console.log('Setting value:', value);
+      this.setCellFormula(row, col, value);
+    } else if (typeof value === 'number') {
+      this.data[row][col] = value;
+      this.formulas[row][col] = null;
+    } else {
+      throw new Error(
+        'Invalid cell value. Must be a number or a formula starting with "="'
+      );
+    }
   }
 
   getCell(row: number, col: number): number {
     return this.data[row][col];
   }
 
+  getCellFormula(row: number, col: number): string | null {
+    return this.formulas[row][col];
+  }
+
   setCellFormula(row: number, col: number, formula: string): void {
     this.formulas[row][col] = formula;
+    //console.log('Setting formula:', formula);
     const result = this.formulaParser.parse(formula);
-    this.setCell(row, col, result);
+    this.data[row][col] = result;
   }
 
   recalculate(): void {
@@ -611,15 +655,73 @@ class FormulaTable {
       for (let col = 0; col < this.data[row].length; col++) {
         if (this.formulas[row][col]) {
           const result = this.formulaParser.parse(this.formulas[row][col]!);
-          this.setCell(row, col, result);
+          this.data[row][col] = result;
         }
       }
     }
   }
+
+  selectCell(row: number, col: number): void {
+    this.selectedCells.push({ row, col });
+  }
+
+  clearSelection(): void {
+    this.selectedCells = [];
+  }
+
+  createFormulaFromSelection(
+    targetRow: number,
+    targetCol: number,
+    operator: '+' | '-' | '*' | '/'
+  ): void {
+    if (this.selectedCells.length < 2) {
+      throw new Error(
+        'At least two cells must be selected to create a formula'
+      );
+    }
+
+    const cellRefs = this.selectedCells.map(
+      (cell) => this.columnToLetter(cell.col) + (cell.row + 1)
+    );
+    const formula = '=' + cellRefs.join(operator);
+
+    this.setCellFormula(targetRow, targetCol, formula);
+    this.clearSelection();
+  }
+
+  private columnToLetter(column: number): string {
+    let temp: number;
+    let letter = '';
+    while (column >= 0) {
+      temp = column % 26;
+      letter = String.fromCharCode(temp + 65) + letter;
+      column = Math.floor(column / 26) - 1;
+    }
+    return letter;
+  }
+
+  // Helper method to convert letter-number notation to row-col indices
+  private cellRefToIndices(cellRef: string): { row: number; col: number } {
+    const match = cellRef.match(/^([A-Z]+)(\d+)$/);
+    if (!match) {
+      throw new Error(`Invalid cell reference: ${cellRef}`);
+    }
+    const col = this.letterToColumn(match[1]);
+    const row = parseInt(match[2]) - 1;
+    return { row, col };
+  }
+
+  private letterToColumn(letters: string): number {
+    let column = 0;
+    for (let i = 0; i < letters.length; i++) {
+      column +=
+        (letters.charCodeAt(i) - 64) * Math.pow(26, letters.length - i - 1);
+    }
+    return column - 1;
+  }
 }
 
 export { FormulaTable };
-
 declare global {
   interface Window {
     wolf: any;
