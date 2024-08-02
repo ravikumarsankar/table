@@ -209,18 +209,6 @@ export default class Table {
     // set editors
     this._editors.set('text', this._editor);
 
-    if (this._editor) {
-      this._editor.changeListener((value: DataCell) => {
-        const editorCell = this._editor!.cellIndex();
-        if (editorCell._value) {
-          this._handleEditorValueChange(
-            editorCell.row(),
-            editorCell.col(),
-            value
-          );
-        }
-      });
-    }
     initEvents(this);
   }
 
@@ -232,6 +220,7 @@ export default class Table {
   }
 
   _handleEditorValueChange(row: number, col: number, value: DataCell) {
+    console.log('handle editor value change', row, col, value);
     this._emitter.emit('editorValueChange', { row, col }, value);
   }
 
@@ -411,7 +400,12 @@ export default class Table {
   cell(row: number, col: number, value?: DataCell): any {
     const { _cells } = this;
     if (value) {
+      const oldValue = _cells.get(row, col);
       _cells.set(row, col, value);
+      // Trigger _handleEditorValueChange if the value has changed
+      if (oldValue !== value) {
+        this._handleEditorValueChange(row, col, value);
+      }
       return this;
     }
     const v = _cells.get(row, col);
