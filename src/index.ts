@@ -224,25 +224,21 @@ export default class Table {
     this._editors.set('text', this._editor);
 
     initEvents(this);
+
+    this.onEditorValueChange((cell, value: DataCell) => {
+      console.log(`Cell (${cell.row}, ${cell.col}) changed to:`, value);
+
+      // Update the cell
+      if (value) this.setCell(cell.row, cell.col, value as DataCell);
+      this.recalculate();
+      this.render();
+    });
   }
 
   onEditorValueChange(
     handler: (cell: { row: number; col: number }, value: DataCell) => void
   ) {
-    this._emitter.on('editorValueChange', (cell, value) => {
-      console.log('on editor value change', cell, value);
-      // Call the provided handler
-      handler(cell, value);
-
-      // Update the cell in FormulaTable
-      this.setCell(cell.row, cell.col, value);
-
-      // Recalculate the table
-      this.recalculate();
-
-      // Update the visual representation
-      this.render();
-    });
+    this._emitter.on('editorValueChange', handler);
     return this;
   }
 
@@ -603,7 +599,7 @@ export default class Table {
     return this;
   }
 
-  setCell(row: number, col: number, value: number | string): void {
+  setCell(row: number, col: number, value: DataCell): void {
     if (typeof value === 'string' && value.startsWith('=')) {
       console.log('Setting value:', value);
       this.setCellFormula(row, col, value);
