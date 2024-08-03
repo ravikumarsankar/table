@@ -132,6 +132,7 @@ export default class Table {
   _editors = new Map();
 
   _selector: Selector | null = null;
+  _restrictFillRange: boolean = false;
   _overlayer: Overlayer;
 
   _canvas: HElement;

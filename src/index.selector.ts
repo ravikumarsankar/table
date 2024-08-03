@@ -27,6 +27,12 @@ function init(t: Table) {
                 col - nRange.endCol,
               ];
               const index = d.indexOf(Math.max.apply(null, d));
+
+              // Check if fill range restriction is enabled
+              if (t._restrictFillRange) {
+                return;
+              }
+
               if (index === 1) {
                 nRange.startRow = nRange.endRow + 1;
                 nRange.endRow = row;
