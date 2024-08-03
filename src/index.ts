@@ -143,6 +143,8 @@ export default class Table {
   _formulas: (string | null)[][];
   _formulaParser: FParser;
   _selectedCells: { row: number; col: number }[];
+  _isFormulaEditing: boolean = false;
+  _formulaEditingCell: { row: number; col: number } | null = null;
 
   constructor(
     element: HTMLElement | string,
@@ -169,6 +171,7 @@ export default class Table {
       .map(() => Array().fill(null));
     this._selectedCells = [];
     this._formulaParser = new FParser(this);
+    this._isFormulaEditing = false;
     // update default data
     if (options) {
       const { minColWidth, minRowHeight, renderer, data } = options;
@@ -230,10 +233,27 @@ export default class Table {
       // assign the cell formula
       if (typeof value === 'string' && value.startsWith('=')) {
         this.setCellFormula(cell.row, cell.col, value);
+        this.startFormulaEditing(cell.row, cell.col);
       }
       this.recalculate();
       this.render();
     });
+
+    this.handleCellClick((cell: ViewportCell, evt: MouseEvent) => {
+      if (this._isFormulaEditing) {
+        const cellRef = `${this.columnToLetter(cell.col)}${cell.row + 1}`;
+        const currentValue = this._editor?.value('') || '';
+        const newValue = currentValue + cellRef;
+        this._editor?.value(newValue);
+      } else {
+        this._emitter.emit('cellClick', cell, evt);
+      }
+    });
+  }
+
+  handleCellClick(handler: (cell: ViewportCell, evt: MouseEvent) => void) {
+    this._emitter.on('editorValueChange', handler);
+    return this;
   }
 
   onEditorValueChange(
@@ -436,9 +456,9 @@ export default class Table {
     }
     const v = _cells.get(row, col);
 
-    // If in edit mode and the cell has a formula, return the formula instead of the calculated value
-    if (this._editor && this._editor.isEditing() && this._formulas[row][col]) {
-      // return this._formulas[row][col];
+    // If in formula editing mode, return the formula instead of the calculated value
+    if (this._isFormulaEditing && this._formulas[row][col]) {
+      return this._formulas[row][col];
     }
 
     return v != null ? v[2] : v;
@@ -502,6 +522,36 @@ export default class Table {
       return this;
     } else {
       return this._data;
+    }
+  }
+
+  startFormulaEditing(row: number, col: number) {
+    this._isFormulaEditing = true;
+    this._formulaEditingCell = { row, col };
+    const currentFormula = this._formulas[row][col] || '=';
+    this._editor?.value(currentFormula);
+    //  this._editor?.focus();
+    console.log(currentFormula);
+  }
+
+  endFormulaEditing() {
+    this._isFormulaEditing = false;
+    this._formulaEditingCell = null;
+  }
+
+  onCellClick(handler: (cell: ViewportCell, evt: MouseEvent) => void) {
+    this._emitter.on('cellClick', handler);
+    return this;
+  }
+
+  applyFormula() {
+    if (this._formulaEditingCell) {
+      const { row, col } = this._formulaEditingCell;
+      const formula: string = String(this._editor?.value('')) || '';
+      this.setCellFormula(row, col, formula);
+      this.endFormulaEditing();
+      this.recalculate();
+      this.render();
     }
   }
 
