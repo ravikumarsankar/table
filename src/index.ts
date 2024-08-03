@@ -249,12 +249,9 @@ export default class Table {
 
     this.handleCellClick((cell: ViewportCell, evt: MouseEvent) => {
       if (this._isFormulaEditing) {
-        const cellRef = `${this.columnToLetter(cell.col)}${cell.row + 1}`;
-        const currentValue = this._editor?.value('') || '';
-        const newValue = currentValue + cellRef;
-        this._editor?.value(newValue);
+        // const cellRef = `${this.columnToLetter(cell.col)}${cell.row + 1}`;
       } else {
-        this._emitter.emit('cellClick', cell, evt);
+        this._emitter.emit('click', cell, evt);
       }
     });
   }
@@ -265,6 +262,18 @@ export default class Table {
       const formula = this.getCellFormula(cell.row, cell.col);
       this._formulaBar.value(formula || '');
     });
+  }
+
+  // on edit and click apply button formula bar
+  applyFormula() {
+    if (this._formulaEditingCell) {
+      const { row, col } = this._formulaEditingCell;
+      const formula: string = String(this._formulaBar.value('')) || '';
+      this.setCellFormula(row, col, formula);
+      this.endFormulaEditing();
+      this.recalculate();
+      this.render();
+    }
   }
 
   onSelectValueChange(handler: (cell: ViewportCell) => void) {
@@ -489,7 +498,7 @@ export default class Table {
 
     // If in formula editing mode, return the formula instead of the calculated value
     if (this._isFormulaEditing && this._formulas[row][col]) {
-      return this._formulas[row][col];
+      //return this._formulas[row][col];
     }
 
     return v != null ? v[2] : v;
@@ -560,30 +569,13 @@ export default class Table {
     this._isFormulaEditing = true;
     this._formulaEditingCell = { row, col };
     const currentFormula = this._formulas[row][col] || '=';
-    this._editor?.value(currentFormula);
-    //  this._editor?.focus();
-    console.log(currentFormula);
+    this._formulaBar.value(currentFormula);
+    //this._formulaBar.focus();
   }
 
   endFormulaEditing() {
     this._isFormulaEditing = false;
     this._formulaEditingCell = null;
-  }
-
-  onCellClick(handler: (cell: ViewportCell, evt: MouseEvent) => void) {
-    this._emitter.on('cellClick', handler);
-    return this;
-  }
-
-  applyFormula() {
-    if (this._formulaEditingCell) {
-      const { row, col } = this._formulaEditingCell;
-      const formula: string = String(this._editor?.value('')) || '';
-      this.setCellFormula(row, col, formula);
-      this.endFormulaEditing();
-      this.recalculate();
-      this.render();
-    }
   }
 
   bloatCellData(data?: TableData) {
