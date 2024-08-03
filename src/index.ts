@@ -636,7 +636,6 @@ export default class Table {
     this._formulas[row][col] = formula;
     const result = this._formulaParser.parse(formula);
 
-    console.log('Setting formula:', formula, result);
     this._cdata[row][col] = result;
     this.cell(row, col, result);
   }
@@ -691,25 +690,6 @@ export default class Table {
     return letter;
   }
 
-  // Helper method to convert letter-number notation to row-col indices
-  cellRefToIndices(cellRef: string): { row: number; col: number } {
-    const match = cellRef.match(/^([A-Z]+)(\d+)$/);
-    if (!match) {
-      throw new Error(`Invalid cell reference: ${cellRef}`);
-    }
-    const col = this.letterToColumn(match[1]);
-    const row = parseInt(match[2]) - 1;
-    return { row, col };
-  }
-
-  letterToColumn(letters: string): number {
-    let column = 0;
-    for (let i = 0; i < letters.length; i++) {
-      column +=
-        (letters.charCodeAt(i) - 64) * Math.pow(26, letters.length - i - 1);
-    }
-    return column - 1;
-  }
   /**
    * @param type keyof cell.type
    * @param editor

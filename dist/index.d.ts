@@ -140,11 +140,6 @@ export default class Table {
     clearSelection(): void;
     createFormulaFromSelection(targetRow: number, targetCol: number, operator: '+' | '-' | '*' | '/'): void;
     columnToLetter(column: number): string;
-    cellRefToIndices(cellRef: string): {
-        row: number;
-        col: number;
-    };
-    letterToColumn(letters: string): number;
     /**
      * @param type keyof cell.type
      * @param editor
