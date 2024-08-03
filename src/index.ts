@@ -143,6 +143,8 @@ export default class Table {
   _formulas: (string | null)[][];
   _formulaParser: FParser;
   _selectedCells: { row: number; col: number }[];
+  _formulaBar: HElement;
+  _formulaBarHeight: number = 30; // Height of the formula bar
 
   constructor(
     element: HTMLElement | string,
@@ -169,6 +171,7 @@ export default class Table {
       .map(() => Array().fill(null));
     this._selectedCells = [];
     this._formulaParser = new FParser(this);
+    this._formulaBar = this._createFormulaBar();
     // update default data
     if (options) {
       const { minColWidth, minRowHeight, renderer, data } = options;
@@ -193,7 +196,12 @@ export default class Table {
     // tabIndex for trigger keydown event
     this._canvas = h(canvasElement).attr('tabIndex', '1');
     this._container.append(canvasElement);
-    this._renderer = new TableRenderer(canvasElement, width(), height());
+    this._container.append(this._formulaBar);
+    this._renderer = new TableRenderer(
+      canvasElement,
+      width(),
+      height() - this._formulaBarHeight
+    );
     this._overlayer = new Overlayer(this._container);
 
     // resize rect of content
@@ -234,6 +242,16 @@ export default class Table {
       this.recalculate();
       this.render();
     });
+
+    this.onSelectValueChange((cell: ViewportCell) => {
+      const formula = this.getCellFormula(cell.row, cell.col);
+      this._formulaBar.value(formula || '');
+    });
+  }
+
+  onSelectValueChange(handler: (cell: ViewportCell) => void) {
+    this._emitter.on('click', handler);
+    return this;
   }
 
   onEditorValueChange(
@@ -245,6 +263,21 @@ export default class Table {
 
   _handleEditorValueChange(row: number, col: number, value: DataCell) {
     this._emitter.emit('editorValueChange', { row, col }, value);
+  }
+
+  _createFormulaBar(): HElement {
+    return h('input')
+      .attr('type', 'text')
+      .attr('placeholder', 'Enter formula')
+      .css({
+        width: this._width(),
+        height: this._formulaBarHeight,
+        padding: '5px 5px 5px 5px',
+        zIndex: '10',
+        boxSizing: 'border-box',
+        position: 'relative',
+        border: '1px solid #ccc',
+      });
   }
 
   contentRect() {
