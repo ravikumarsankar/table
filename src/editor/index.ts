@@ -87,8 +87,4 @@ export default class Editor {
     this._changer = value;
     return this;
   }
-
-  isEditing(): boolean {
-    return this._visible;
-  }
 }

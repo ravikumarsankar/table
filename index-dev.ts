@@ -37,7 +37,7 @@ const table = WolfTable.create(
     ],
   })
   .onClick((cell, evt) => {
-    // console.log('cell:', cell, evt);
+    console.log('cell:', cell, evt);
   })
   .onContextmenu((cell, evt) => {
     console.log('contetmenu:', cell);
@@ -100,9 +100,10 @@ console.log('\nAfter changing A1 to 15:');
 table.cell(0, 0, 10);
 table.cell(1, 1, 20);
 
+table._restrictFillRange = true;
 // Select cells and create a formula
-table.selectCell(0, 0); // Select A1
-table.selectCell(1, 1); // Select B2
-table.createFormulaFromSelection(2, 2, '+'); // Set C3 to =A1+B2
+//table.selectCell(0, 0); // Select A1
+//table.selectCell(1, 1); // Select B2
+//table.createFormulaFromSelection(2, 2, '+'); // Set C3 to =A1+B2
 table.render();
 console.log(table.getCell(2, 2)); // Output: 30

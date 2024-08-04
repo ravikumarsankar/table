@@ -17,6 +17,7 @@ import TableRenderer, {
   expr2xy,
   Gridline,
   ViewportCell,
+  Cell,
 } from '@wolf-table/table-renderer';
 import {
   defaultData,
@@ -119,6 +120,8 @@ export default class Table {
 
   _cells = new Cells();
 
+  _tooltip: TableTooltip;
+
   // scrollbar
   _vScrollbar: Scrollbar | null = null;
   _hScrollbar: Scrollbar | null = null;
@@ -143,7 +146,7 @@ export default class Table {
   _cdata: number[][];
   _formulas: (string | null)[][];
   _formulaParser: FParser;
-  _selectedCells: { row: number; col: number }[];
+
   constructor(
     element: HTMLElement | string,
     width: () => number,
@@ -195,6 +198,7 @@ export default class Table {
     this._container.append(canvasElement);
     this._renderer = new TableRenderer(canvasElement, width(), height());
     this._overlayer = new Overlayer(this._container);
+    this._tooltip = new TableTooltip(this._container);
 
     // resize rect of content
     resizeContentRect(this);
@@ -235,10 +239,25 @@ export default class Table {
       this.render();
     });
 
+    this.onSelectValueChange((cell: ViewportCell) => {
+      const formula = this.getCellFormula(cell.row, cell.col);
+      if (formula) {
+        this._tooltip.show(cell, formula);
+      } else {
+        this._tooltip.hide();
+      }
+    });
+
     this.onSelectedCellKeydown(({ row, col, evt }) => {
       console.log(`Keydown event on cell (${row}, ${col}):`, evt.key);
-      // Add custom handling here
+      const formula = this.getCellFormula(row, col);
+      this._tooltip.hide();
     });
+  }
+
+  onSelectValueChange(handler: (cell: ViewportCell) => void) {
+    this._emitter.on('click', handler);
+    return this;
   }
 
   handleSelectedCellKeydown(
@@ -460,7 +479,7 @@ export default class Table {
     const v = _cells.get(row, col);
 
     // If in edit mode and the cell has a formula, return the formula instead of the calculated value
-    if (this._editor && this._editor.isEditing() && this._formulas[row][col]) {
+    if (this._editor && this._formulas[row][col]) {
       // return this._formulas[row][col];
     }
 
@@ -674,45 +693,6 @@ export default class Table {
     }
   }
 
-  selectCell(row: number, col: number): void {
-    this._selectedCells.push({ row, col });
-  }
-
-  clearSelection(): void {
-    this._selectedCells = [];
-  }
-
-  createFormulaFromSelection(
-    targetRow: number,
-    targetCol: number,
-    operator: '+' | '-' | '*' | '/'
-  ): void {
-    if (this._selectedCells.length < 2) {
-      throw new Error(
-        'At least two cells must be selected to create a formula'
-      );
-    }
-
-    const cellRefs = this._selectedCells.map(
-      (cell) => this.columnToLetter(cell.col) + (cell.row + 1)
-    );
-    const formula = '=' + cellRefs.join(operator);
-
-    this.setCellFormula(targetRow, targetCol, formula);
-    this.clearSelection();
-  }
-
-  columnToLetter(column: number): string {
-    let temp: number;
-    let letter = '';
-    while (column >= 0) {
-      temp = column % 26;
-      letter = String.fromCharCode(temp + 65) + letter;
-      column = Math.floor(column / 26) - 1;
-    }
-    return letter;
-  }
-
   /**
    * @param type keyof cell.type
    * @param editor
@@ -740,6 +720,44 @@ function resizeContentRect(t: Table) {
     width: colsWidth(t._data),
     height: rowsHeight(t._data),
   };
+}
+
+export class TableTooltip {
+  private _container: HElement;
+  private _tooltip: HElement;
+
+  constructor(container: HElement) {
+    this._container = container;
+    this._tooltip = this._createTooltip();
+    this._container.append(this._tooltip);
+  }
+
+  private _createTooltip(): HElement {
+    return h('div').css({
+      position: 'absolute',
+      color: 'white',
+      padding: '5px',
+      borderRadius: '3px',
+      fontSize: '12px',
+      zIndex: '1000',
+      display: 'none',
+      'background-color': 'lightblue',
+    });
+  }
+
+  show(cell: ViewportCell, formula: string): void {
+    const { x, y, width } = cell;
+    this._tooltip.html(formula).css({
+      left: `${x + 25}px`,
+      top: `${y - 25}px`,
+      maxWidth: `${width}px`,
+      display: 'block',
+    });
+  }
+
+  hide(): void {
+    this._tooltip.css('display', 'none');
+  }
 }
 
 declare global {

@@ -23,6 +23,5 @@ export default class Editor {
     hide(): this;
     moveChanger(value: MoveChanger): this;
     changer(value: Changer): this;
-    isEditing(): boolean;
 }
 export {};
