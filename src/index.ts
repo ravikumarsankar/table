@@ -738,7 +738,7 @@ export class TableTooltip {
       color: 'white',
       padding: '5px',
       borderRadius: '3px',
-      fontSize: '12px',
+      fontSize: '10px',
       zIndex: '1000',
       display: 'none',
       'background-color': 'lightblue',
