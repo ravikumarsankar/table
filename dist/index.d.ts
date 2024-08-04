@@ -65,10 +65,6 @@ export default class Table {
     _cdata: number[][];
     _formulas: (string | null)[][];
     _formulaParser: FParser;
-    _selectedCells: {
-        row: number;
-        col: number;
-    }[];
     constructor(element: HTMLElement | string, width: () => number, height: () => number, options?: TableOptions);
     onSelectValueChange(handler: (cell: ViewportCell) => void): this;
     handleSelectedCellKeydown(row: number, col: number, evt: KeyboardEvent): void;
@@ -145,10 +141,6 @@ export default class Table {
     getCellFormula(row: number, col: number): string | null;
     setCellFormula(row: number, col: number, formula: string): void;
     recalculate(): void;
-    selectCell(row: number, col: number): void;
-    clearSelection(): void;
-    createFormulaFromSelection(targetRow: number, targetCol: number, operator: '+' | '-' | '*' | '/'): void;
-    columnToLetter(column: number): string;
     /**
      * @param type keyof cell.type
      * @param editor

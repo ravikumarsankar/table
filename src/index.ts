@@ -146,7 +146,7 @@ export default class Table {
   _cdata: number[][];
   _formulas: (string | null)[][];
   _formulaParser: FParser;
-  _selectedCells: { row: number; col: number }[];
+
   constructor(
     element: HTMLElement | string,
     width: () => number,
@@ -479,7 +479,7 @@ export default class Table {
     const v = _cells.get(row, col);
 
     // If in edit mode and the cell has a formula, return the formula instead of the calculated value
-    if (this._editor && this._editor.isEditing() && this._formulas[row][col]) {
+    if (this._editor && this._formulas[row][col]) {
       // return this._formulas[row][col];
     }
 
@@ -691,45 +691,6 @@ export default class Table {
         }
       }
     }
-  }
-
-  selectCell(row: number, col: number): void {
-    this._selectedCells.push({ row, col });
-  }
-
-  clearSelection(): void {
-    this._selectedCells = [];
-  }
-
-  createFormulaFromSelection(
-    targetRow: number,
-    targetCol: number,
-    operator: '+' | '-' | '*' | '/'
-  ): void {
-    if (this._selectedCells.length < 2) {
-      throw new Error(
-        'At least two cells must be selected to create a formula'
-      );
-    }
-
-    const cellRefs = this._selectedCells.map(
-      (cell) => this.columnToLetter(cell.col) + (cell.row + 1)
-    );
-    const formula = '=' + cellRefs.join(operator);
-
-    this.setCellFormula(targetRow, targetCol, formula);
-    this.clearSelection();
-  }
-
-  columnToLetter(column: number): string {
-    let temp: number;
-    let letter = '';
-    while (column >= 0) {
-      temp = column % 26;
-      letter = String.fromCharCode(temp + 65) + letter;
-      column = Math.floor(column / 26) - 1;
-    }
-    return letter;
   }
 
   /**
