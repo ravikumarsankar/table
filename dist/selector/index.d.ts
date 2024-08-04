@@ -1,5 +1,6 @@
 import { Range, Rect } from '@wolf-table/table-renderer';
 import HElement from '../element';
+import { SelectedCell } from '../index.selector';
 declare class SelectArea {
     _: HElement;
     _rect: Rect | null;
@@ -21,6 +22,7 @@ declare type Placement = 'all' | 'row-header' | 'col-header' | 'body';
 export default class Selector {
     _placement: Placement;
     _editable: boolean;
+    _currentCell: SelectedCell;
     _ranges: Range[];
     _rowHeaderRanges: Range[];
     _colHeaderRanges: Range[];

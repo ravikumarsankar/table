@@ -68,6 +68,12 @@ export default class Table {
         col: number;
     }[];
     constructor(element: HTMLElement | string, width: () => number, height: () => number, options?: TableOptions);
+    handleSelectedCellKeydown(row: number, col: number, evt: KeyboardEvent): void;
+    onSelectedCellKeydown(handler: (data: {
+        row: number;
+        col: number;
+        evt: KeyboardEvent;
+    }) => void): Table;
     onEditorValueChange(handler: (cell: {
         row: number;
         col: number;

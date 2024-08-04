@@ -198,6 +198,12 @@ function keydownHandler(t: Table, evt: any) {
   } else if (code === 'Escape') {
     selector.clearCopy(t);
   }
+
+  // Handle keydown for the currently selected cell
+  const selectedCell = t._selector?._currentCell;
+  if (selectedCell) {
+    t.handleSelectedCellKeydown(selectedCell.row, selectedCell.col, evt);
+  }
   if (direction) {
     selector.move(
       t,

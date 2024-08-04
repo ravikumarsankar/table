@@ -1,7 +1,7 @@
 import { Range, Rect } from '@wolf-table/table-renderer';
 import { stylePrefix, borderWidth } from '../config';
 import HElement, { h } from '../element';
-
+import { SelectedCell } from '../index.selector';
 class SelectArea {
   _: HElement;
   _rect: Rect | null = null;
@@ -62,7 +62,7 @@ type Placement = 'all' | 'row-header' | 'col-header' | 'body';
 export default class Selector {
   _placement: Placement = 'body';
   _editable = false;
-
+  _currentCell: SelectedCell = { row: 0, col: 0 };
   _ranges: Range[] = [];
   _rowHeaderRanges: Range[] = [];
   _colHeaderRanges: Range[] = [];
@@ -100,11 +100,13 @@ export default class Selector {
     this._focus = [row, col];
     this._focusRange = range;
     this._move = [row, col];
+    this._currentCell = { row, col };
     return this;
   }
 
   move(row: number, col: number) {
     this._move = [row, col];
+    this._currentCell = { row, col };
     return this;
   }
 

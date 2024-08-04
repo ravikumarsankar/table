@@ -5,7 +5,10 @@ import { DataCell, rangeUnoinMerges, stepColIndex, stepRowIndex } from './data';
 import Selector from './selector';
 import scrollbar from './index.scrollbar';
 import { bindMousemoveAndMouseup } from './event';
-
+export interface SelectedCell {
+  row: number;
+  col: number;
+}
 function init(t: Table) {
   t._selector = new Selector(!!t._editable).autofillTrigger((evt) => {
     const { _selector } = t;
@@ -265,6 +268,7 @@ function move(
       const { rows, cols } = _data;
 
       let [r, c] = _selector._move;
+
       if (!reselect) {
         startRow = endRow = r;
         startCol = endCol = c;

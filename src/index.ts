@@ -143,7 +143,6 @@ export default class Table {
   _formulas: (string | null)[][];
   _formulaParser: FParser;
   _selectedCells: { row: number; col: number }[];
-
   constructor(
     element: HTMLElement | string,
     width: () => number,
@@ -234,6 +233,29 @@ export default class Table {
       this.recalculate();
       this.render();
     });
+
+    this.onSelectedCellKeydown(({ row, col, evt }) => {
+      console.log(`Keydown event on cell (${row}, ${col}):`, evt.key);
+      // Add custom handling here
+    });
+  }
+
+  handleSelectedCellKeydown(
+    row: number,
+    col: number,
+    evt: KeyboardEvent
+  ): void {
+    //const { key } = evt;
+    // Emit a custom event for the selected cell keydown
+    console.log(`Keydown event on `);
+    this._emitter.emit('selectedCellKeydown', { row, col, evt });
+  }
+
+  onSelectedCellKeydown(
+    handler: (data: { row: number; col: number; evt: KeyboardEvent }) => void
+  ): Table {
+    this._emitter.on('selectedCellKeydown', handler);
+    return this;
   }
 
   onEditorValueChange(
