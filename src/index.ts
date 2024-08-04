@@ -239,18 +239,32 @@ export default class Table {
       this.render();
     });
 
+    this.onSelectValueChange((cell: ViewportCell) => {
+      const formula = this.getCellFormula(cell.row, cell.col);
+      if (formula) {
+        this._tooltip.show(cell, formula);
+      } else {
+        this._tooltip.hide();
+      }
+    });
+
     this.onSelectedCellKeydown(({ row, col, evt }) => {
       console.log(`Keydown event on cell (${row}, ${col}):`, evt.key);
       const formula = this.getCellFormula(row, col);
-      const cell: ViewportCell = this.getCell(row, col);
+      //const cell: ViewportCell = this.getCell(row, col);
       if (formula) {
-        this._tooltip.show(cell, formula);
+        // this._tooltip.show(cell, formula);
       } else {
         this._tooltip.hide();
       }
 
       // Add custom handling here
     });
+  }
+
+  onSelectValueChange(handler: (cell: ViewportCell) => void) {
+    this._emitter.on('click', handler);
+    return this;
   }
 
   handleSelectedCellKeydown(

@@ -50,6 +50,7 @@ export default class Table {
     _data: TableData;
     _renderer: TableRenderer;
     _cells: Cells;
+    _tooltip: TableTooltip;
     _vScrollbar: Scrollbar | null;
     _hScrollbar: Scrollbar | null;
     _rowResizer: Resizer | null;
@@ -57,6 +58,7 @@ export default class Table {
     _editor: Editor | null;
     _editors: Map<any, any>;
     _selector: Selector | null;
+    _restrictFillRange: boolean;
     _overlayer: Overlayer;
     _canvas: HElement;
     _emitter: EventEmitter;
@@ -68,6 +70,7 @@ export default class Table {
         col: number;
     }[];
     constructor(element: HTMLElement | string, width: () => number, height: () => number, options?: TableOptions);
+    onSelectValueChange(handler: (cell: ViewportCell) => void): this;
     handleSelectedCellKeydown(row: number, col: number, evt: KeyboardEvent): void;
     onSelectedCellKeydown(handler: (data: {
         row: number;
@@ -153,6 +156,14 @@ export default class Table {
      */
     addEditor(type: string, editor: Editor): this;
     static create(element: HTMLElement | string, width: () => number, height: () => number, options?: TableOptions): Table;
+}
+export declare class TableTooltip {
+    private _container;
+    private _tooltip;
+    constructor(container: HElement);
+    private _createTooltip;
+    show(cell: ViewportCell, formula: string): void;
+    hide(): void;
 }
 declare global {
     interface Window {
