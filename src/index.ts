@@ -735,10 +735,10 @@ export class TableTooltip {
   private _createTooltip(): HElement {
     return h('div').css({
       position: 'absolute',
-      color: 'white',
+      color: 'grey',
       padding: '5px',
       borderRadius: '3px',
-      fontSize: '10px',
+      fontSize: '8px',
       zIndex: '1000',
       display: 'none',
       'background-color': 'lightblue',
