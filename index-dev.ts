@@ -100,7 +100,7 @@ console.log('\nAfter changing A1 to 15:');
 table.cell(0, 0, 10);
 table.cell(1, 1, 20);
 
-table._restrictFillRange = true;
+//table._restrictFillRange = true;
 // Select cells and create a formula
 //table.selectCell(0, 0); // Select A1
 //table.selectCell(1, 1); // Select B2
