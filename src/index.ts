@@ -251,14 +251,7 @@ export default class Table {
     this.onSelectedCellKeydown(({ row, col, evt }) => {
       console.log(`Keydown event on cell (${row}, ${col}):`, evt.key);
       const formula = this.getCellFormula(row, col);
-      //const cell: ViewportCell = this.getCell(row, col);
-      if (formula) {
-        // this._tooltip.show(cell, formula);
-      } else {
-        this._tooltip.hide();
-      }
-
-      // Add custom handling here
+      this._tooltip.hide();
     });
   }
 
