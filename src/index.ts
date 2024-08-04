@@ -747,10 +747,11 @@ export class TableTooltip {
 
   show(cell: ViewportCell, formula: string): void {
     const { x, y, width } = cell;
+    const xPadding: string = x + 25 + 'px';
     this._tooltip.html(formula).css({
-      left: `${x + 25}px`,
-      top: `${y - 25}px`,
-      maxWidth: `${width}px`,
+      left: xPadding,
+      top: y - 25,
+      maxWidth: width,
       display: 'block',
     });
   }
