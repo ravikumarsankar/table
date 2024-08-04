@@ -17,6 +17,7 @@ import TableRenderer, {
   expr2xy,
   Gridline,
   ViewportCell,
+  Cell,
 } from '@wolf-table/table-renderer';
 import {
   defaultData,
@@ -119,6 +120,8 @@ export default class Table {
 
   _cells = new Cells();
 
+  _tooltip: TableTooltip;
+
   // scrollbar
   _vScrollbar: Scrollbar | null = null;
   _hScrollbar: Scrollbar | null = null;
@@ -195,6 +198,7 @@ export default class Table {
     this._container.append(canvasElement);
     this._renderer = new TableRenderer(canvasElement, width(), height());
     this._overlayer = new Overlayer(this._container);
+    this._tooltip = new TableTooltip(this._container);
 
     // resize rect of content
     resizeContentRect(this);
@@ -237,6 +241,14 @@ export default class Table {
 
     this.onSelectedCellKeydown(({ row, col, evt }) => {
       console.log(`Keydown event on cell (${row}, ${col}):`, evt.key);
+      const formula = this.getCellFormula(row, col);
+      const cell: ViewportCell = this.getCell(row, col);
+      if (formula) {
+        this._tooltip.show(cell, formula);
+      } else {
+        this._tooltip.hide();
+      }
+
       // Add custom handling here
     });
   }
@@ -740,6 +752,44 @@ function resizeContentRect(t: Table) {
     width: colsWidth(t._data),
     height: rowsHeight(t._data),
   };
+}
+
+export class TableTooltip {
+  private _container: HElement;
+  private _tooltip: HElement;
+
+  constructor(container: HElement) {
+    this._container = container;
+    this._tooltip = this._createTooltip();
+    this._container.append(this._tooltip);
+  }
+
+  private _createTooltip(): HElement {
+    return h('div').css({
+      position: 'absolute',
+      color: 'white',
+      padding: '5px',
+      borderRadius: '3px',
+      fontSize: '12px',
+      zIndex: '1000',
+      display: 'none',
+      'background-color': 'lightblue',
+    });
+  }
+
+  show(cell: ViewportCell, formula: string): void {
+    const { x, y, width } = cell;
+    this._tooltip.html(formula).css({
+      left: `${x + 25}px`,
+      top: `${y - 25}px`,
+      maxWidth: `${width}px`,
+      display: 'block',
+    });
+  }
+
+  hide(): void {
+    this._tooltip.css('display', 'none');
+  }
 }
 
 declare global {
