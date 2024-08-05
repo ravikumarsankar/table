@@ -248,13 +248,11 @@ export default class Table {
 
     this.onKeyDown((row, col, cell) => {
       console.log('key', row, col, cell);
-      if (row > 0 && col > 0) {
-        const formula = this.getCellFormula(row, col);
-        if (formula) {
-          this._tooltip.show(cell, formula);
-        } else {
-          this._tooltip.hide();
-        }
+      const formula = this.getCellFormula(row, col);
+      if (formula) {
+        this._tooltip.show(cell, formula);
+      } else {
+        this._tooltip.hide();
       }
       this._tooltip.hide();
     });

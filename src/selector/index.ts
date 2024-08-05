@@ -63,6 +63,10 @@ export default class Selector {
   _placement: Placement = 'body';
   _editable = false;
   _currentCell: SelectedCell = { row: 0, col: 0 };
+  _currentCellRect: Rect = rect2outlineRect(
+    { x: 0, y: 0, width: 0, height: 0 },
+    0
+  );
   _ranges: Range[] = [];
   _rowHeaderRanges: Range[] = [];
   _colHeaderRanges: Range[] = [];
@@ -143,6 +147,7 @@ export default class Selector {
       .rect(rect2outlineRect(rect, borderWidth))
       .target(target);
     if (this._placement === 'body') {
+      this._currentCellRect = rect;
       outline.append(
         h('div', 'corner')
           .attr('draggable', 'false')

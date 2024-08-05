@@ -204,16 +204,15 @@ function keydownHandler(t: Table, evt: any) {
   // Handle keydown for the currently selected cell
   if (t._selector) {
     const selectedCell = t._selector._currentCell;
-    const selectedArea = t._selector._focusArea;
-    if (viewport && selectedCell && selectedArea && selectedArea._rect) {
+    const selectedRect = t._selector._currentCellRect;
+    if (viewport && selectedCell && selectedRect) {
       _emitter.emit(
         'key',
         selectedCell.row,
         selectedCell.col,
-        viewport.cellAt(selectedArea._rect.x, selectedArea._rect.y)
+        viewport.cellAt(selectedRect.x, selectedRect.y)
       );
     }
-    console.log(t._selector.currentRange);
   }
   if (direction) {
     selector.move(
