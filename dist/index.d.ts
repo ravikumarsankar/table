@@ -70,6 +70,7 @@ export default class Table {
     onSelectedCellKeydown(handler: (data: {
         row: number;
         col: number;
+        cell: ViewportCell;
     }) => void): Table;
     onEditorValueChange(handler: (cell: {
         row: number;
@@ -132,7 +133,6 @@ export default class Table {
      */
     toHtml(from: string): string;
     toArrays(from: string): DataCellValue[][];
-    onKey(handler: (cell: ViewportCell, row: number, col: number) => void): this;
     onClick(handler: (cell: ViewportCell, evt: MouseEvent) => void): this;
     onContextmenu(handler: (cell: ViewportCell, evt: MouseEvent) => void): this;
     getCell(row: number, col: number): number;
