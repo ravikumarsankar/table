@@ -250,6 +250,7 @@ export default class Table {
     this.onSelectedCellKeydown(({ row, col, cell }) => {
       if (row > 0 && col > 0) {
         const formula = this.getCellFormula(row, col);
+        console.log(cell, formula);
         // if (formula ) {
         //   this._tooltip.show(cell, formula);
         // } else {

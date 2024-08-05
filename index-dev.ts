@@ -37,7 +37,7 @@ const table = WolfTable.create(
     ],
   })
   .onClick((cell, evt) => {
-    console.log('cell:', cell, evt);
+    // console.log('cell:', cell, evt);
   })
   .onContextmenu((cell, evt) => {
     console.log('contetmenu:', cell);

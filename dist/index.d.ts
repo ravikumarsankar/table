@@ -67,17 +67,15 @@ export default class Table {
     _formulaParser: FParser;
     constructor(element: HTMLElement | string, width: () => number, height: () => number, options?: TableOptions);
     onSelectValueChange(handler: (cell: ViewportCell) => void): this;
-    handleSelectedCellKeydown(row: number, col: number, evt: KeyboardEvent): void;
     onSelectedCellKeydown(handler: (data: {
+        cell: ViewportCell;
         row: number;
         col: number;
-        evt: KeyboardEvent;
     }) => void): Table;
     onEditorValueChange(handler: (cell: {
         row: number;
         col: number;
     }, value: DataCell) => void): this;
-    _handleEditorValueChange(row: number, col: number, value: DataCell): void;
     contentRect(): Rect;
     container(): HElement;
     resize(): void;
@@ -135,6 +133,7 @@ export default class Table {
      */
     toHtml(from: string): string;
     toArrays(from: string): DataCellValue[][];
+    onKey(handler: (cell: ViewportCell, row: number, col: number) => void): this;
     onClick(handler: (cell: ViewportCell, evt: MouseEvent) => void): this;
     onContextmenu(handler: (cell: ViewportCell, evt: MouseEvent) => void): this;
     getCell(row: number, col: number): number;
