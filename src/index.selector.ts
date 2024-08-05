@@ -10,9 +10,6 @@ export interface SelectedCell {
   col: number;
 }
 
-enum TOOLTIP_SPACE {
-  KeyDownX = 8,
-}
 function init(t: Table) {
   t._selector = new Selector(!!t._editable).autofillTrigger((evt) => {
     const { _selector } = t;
@@ -326,7 +323,7 @@ function move(
             if (v_cell && targetRect)
               _emitter.emit('key', selectedCell.row, selectedCell.col, {
                 ...v_cell,
-                x: targetRect?.left + TOOLTIP_SPACE.KeyDownX,
+                x: targetRect?.left,
                 y: targetRect?.top - t._renderer._rowHeight / 2,
               });
           }
