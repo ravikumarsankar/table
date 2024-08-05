@@ -247,9 +247,16 @@ export default class Table {
       }
     });
 
-    this.onSelectedCellKeydown(({ row, col, evt }) => {
-      const formula = this.getCellFormula(row, col);
-      this._tooltip.hide();
+    this.onSelectedCellKeydown(({ row, col, cell }) => {
+      if (row > 0 && col > 0) {
+        const formula = this.getCellFormula(row, col);
+        // if (formula ) {
+        //   this._tooltip.show(cell, formula);
+        // } else {
+        //   this._tooltip.hide();
+        // }
+        this._tooltip.hide();
+      }
     });
   }
 
@@ -259,7 +266,7 @@ export default class Table {
   }
 
   onSelectedCellKeydown(
-    handler: (data: { row: number; col: number; evt: KeyboardEvent }) => void
+    handler: (data: { cell: ViewportCell; row: number; col: number }) => void
   ): Table {
     this._emitter.on('key', handler);
     return this;
@@ -270,10 +277,6 @@ export default class Table {
   ) {
     this._emitter.on('editorValueChange', handler);
     return this;
-  }
-
-  _handleEditorValueChange(row: number, col: number, value: DataCell) {
-    this._emitter.emit('editorValueChange', { row, col }, value);
   }
 
   contentRect() {
@@ -459,7 +462,7 @@ export default class Table {
       }
       // Trigger _handleEditorValueChange if the value has changed
       if (oldValue !== value) {
-        this._handleEditorValueChange(row, col, value);
+        this._emitter.emit('editorValueChange', { row, col }, value);
       }
       return this;
     }
@@ -643,7 +646,7 @@ export default class Table {
     return arrays;
   }
 
-  onKey(handler: (cell: ViewportCell, evt: MouseEvent) => void) {
+  onKey(handler: (cell: ViewportCell, row: number, col: number) => void) {
     this._emitter.on('key', handler);
     return this;
   }
