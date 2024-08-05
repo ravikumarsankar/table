@@ -203,13 +203,13 @@ function keydownHandler(t: Table, evt: any) {
 
   // Handle keydown for the currently selected cell
   const selectedCell = t._selector?._currentCell;
-  const selectedArea = t._selector?._focusArea;
+  // const selectedArea = t._selector?._focusArea;
   if (selectedCell) {
-    const vcell: ViewportCell = viewport?.cellAt(
-      selectedArea?._rect?.x,
-      selectedArea?._rect?.y
-    );
-    _emitter.emit('key', vcell, selectedCell.row, selectedCell.col);
+    // const vcell: ViewportCell = viewport?.cellAt(
+    //   selectedArea?._rect?.x,
+    //   selectedArea?._rect?.y
+    // );
+    _emitter.emit('key', null, selectedCell.row, selectedCell.col);
   }
   if (direction) {
     selector.move(

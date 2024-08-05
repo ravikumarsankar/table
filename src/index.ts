@@ -743,9 +743,8 @@ export class TableTooltip {
 
   show(cell: ViewportCell, formula: string): void {
     const { x, y, width } = cell;
-    const xPadding: string = x + 25 + 'px';
     this._tooltip.html(formula).css({
-      left: xPadding,
+      left: x + 25,
       top: y - 25,
       maxWidth: width,
       display: 'block',
