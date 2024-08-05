@@ -1,5 +1,5 @@
 {
-  "name": "@wolf-table/table",
+  "name": "@lumel/table",
   "version": "0.0.4",
   "description": "a web-based(canvas) javascript table",
   "main": "dist/table.min.js",
