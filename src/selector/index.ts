@@ -146,8 +146,8 @@ export default class Selector {
     const outline = new SelectArea(`selector`, true)
       .rect(rect2outlineRect(rect, borderWidth))
       .target(target);
+    this._currentCellRect = rect;
     if (this._placement === 'body') {
-      this._currentCellRect = rect;
       outline.append(
         h('div', 'corner')
           .attr('draggable', 'false')

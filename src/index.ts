@@ -247,8 +247,9 @@ export default class Table {
     });
 
     this.onKeyDown((row, col, cell) => {
-      console.log('key', row, col, cell);
       const formula = this.getCellFormula(row, col);
+      console.log('key', row, col, cell);
+      console.log('formula', formula);
       if (formula) {
         this._tooltip.show(cell, formula);
       } else {
