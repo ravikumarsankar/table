@@ -229,7 +229,6 @@ export default class Table {
     initEvents(this);
 
     this.onEditorValueChange((cell, value: DataCell) => {
-      //console.log(`Cell (${cell.row}, ${cell.col}) changed to:`, value);
       // assign the cell formula
       if (typeof value === 'string' && value.startsWith('=')) {
         this.setCellFormula(cell.row, cell.col, value);
@@ -247,7 +246,8 @@ export default class Table {
       }
     });
 
-    this.onSelectedCellKeydown(({ row, col, cell }) => {
+    this.onKeyDown((row, col, cell) => {
+      console.log('key', row, col, cell);
       if (row > 0 && col > 0) {
         const formula = this.getCellFormula(row, col);
         if (formula) {
@@ -265,17 +265,15 @@ export default class Table {
     return this;
   }
 
-  onSelectedCellKeydown(
-    handler: (data: { row: number; col: number; cell: ViewportCell }) => void
-  ): Table {
-    this._emitter.on('key', handler);
-    return this;
-  }
-
   onEditorValueChange(
     handler: (cell: { row: number; col: number }, value: DataCell) => void
   ) {
     this._emitter.on('editorValueChange', handler);
+    return this;
+  }
+
+  onKeyDown(handler: (row: number, col: number, cell: ViewportCell) => void) {
+    this._emitter.on('key', handler);
     return this;
   }
 

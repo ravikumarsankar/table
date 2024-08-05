@@ -212,6 +212,11 @@ function keydownHandler(t: Table, evt: any) {
         selectedCell.col,
         viewport.cellAt(selectedArea._rect.x, selectedArea._rect.y)
       );
+      console.log(
+        selectedCell.row,
+        selectedCell.col,
+        viewport.cellAt(selectedArea._rect.x, selectedArea._rect.y)
+      );
     }
   }
   if (direction) {
