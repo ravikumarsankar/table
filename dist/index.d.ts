@@ -68,7 +68,6 @@ export default class Table {
     constructor(element: HTMLElement | string, width: () => number, height: () => number, options?: TableOptions);
     onSelectValueChange(handler: (cell: ViewportCell) => void): this;
     onSelectedCellKeydown(handler: (data: {
-        cell: ViewportCell;
         row: number;
         col: number;
     }) => void): Table;

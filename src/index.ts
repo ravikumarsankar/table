@@ -247,17 +247,17 @@ export default class Table {
       }
     });
 
-    this.onSelectedCellKeydown(({ row, col, cell }) => {
+    this.onSelectedCellKeydown(({ row, col }) => {
       if (row > 0 && col > 0) {
-        const formula = this.getCellFormula(row, col);
-        console.log(cell, formula);
+        //const formula = this.getCellFormula(row, col);
+        //console.log(cell, formula);
         // if (formula ) {
         //   this._tooltip.show(cell, formula);
         // } else {
         //   this._tooltip.hide();
         // }
-        this._tooltip.hide();
       }
+      this._tooltip.hide();
     });
   }
 
@@ -267,7 +267,7 @@ export default class Table {
   }
 
   onSelectedCellKeydown(
-    handler: (data: { cell: ViewportCell; row: number; col: number }) => void
+    handler: (data: { row: number; col: number }) => void
   ): Table {
     this._emitter.on('key', handler);
     return this;

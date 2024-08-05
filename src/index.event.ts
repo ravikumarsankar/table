@@ -209,7 +209,7 @@ function keydownHandler(t: Table, evt: any) {
     //   selectedArea?._rect?.x,
     //   selectedArea?._rect?.y
     // );
-    _emitter.emit('key', null, selectedCell.row, selectedCell.col);
+    _emitter.emit('key', selectedCell.row, selectedCell.col);
   }
   if (direction) {
     selector.move(
