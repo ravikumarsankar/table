@@ -9,6 +9,10 @@ export interface SelectedCell {
   row: number;
   col: number;
 }
+
+enum TOOLTIP_SPACE {
+  KeyDownX = 8,
+}
 function init(t: Table) {
   t._selector = new Selector(!!t._editable).autofillTrigger((evt) => {
     const { _selector } = t;
@@ -257,7 +261,6 @@ function moveAutofill(t: Table, direction: MoveDirection) {
   }
   return false;
 }
-
 function move(
   t: Table,
   reselect: boolean,
@@ -265,7 +268,7 @@ function move(
   step?: number
 ) {
   if (moveAutofill(t, direction)) return;
-  const { _selector, _data } = t;
+  const { _selector, _data, _emitter } = t;
   const { viewport } = t._renderer;
   if (_selector && viewport) {
     const { _focusRange } = _selector;
@@ -312,6 +315,24 @@ function move(
         }
       }
       _selector.placement('body');
+      // Handle keydown for the currently selected cell
+      setTimeout(() => {
+        if (t._selector) {
+          const selectedCell = t._selector._currentCell;
+          const target = t._selector._areas[0]?._._;
+          const targetRect = target?.getBoundingClientRect() as DOMRect;
+          if (viewport && selectedCell && targetRect) {
+            const v_cell = viewport.cellAt(targetRect.x, targetRect.y);
+            if (v_cell && targetRect)
+              _emitter.emit('key', selectedCell.row, selectedCell.col, {
+                ...v_cell,
+                x: targetRect?.left + TOOLTIP_SPACE.KeyDownX,
+                y: targetRect?.top - t._renderer._rowHeight / 2,
+              });
+          }
+        }
+      }, 50);
+
       scrollbar.autoMove(
         t,
         _selector.currentRange,
