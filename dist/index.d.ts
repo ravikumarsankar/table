@@ -67,15 +67,11 @@ export default class Table {
     _formulaParser: FParser;
     constructor(element: HTMLElement | string, width: () => number, height: () => number, options?: TableOptions);
     onSelectValueChange(handler: (cell: ViewportCell) => void): this;
-    onSelectedCellKeydown(handler: (data: {
-        row: number;
-        col: number;
-        cell: ViewportCell;
-    }) => void): Table;
     onEditorValueChange(handler: (cell: {
         row: number;
         col: number;
     }, value: DataCell) => void): this;
+    onKeyDown(handler: (row: number, col: number, cell: ViewportCell) => void): this;
     contentRect(): Rect;
     container(): HElement;
     resize(): void;

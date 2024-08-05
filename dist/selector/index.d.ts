@@ -23,6 +23,7 @@ export default class Selector {
     _placement: Placement;
     _editable: boolean;
     _currentCell: SelectedCell;
+    _currentCellRect: Rect;
     _ranges: Range[];
     _rowHeaderRanges: Range[];
     _colHeaderRanges: Range[];
