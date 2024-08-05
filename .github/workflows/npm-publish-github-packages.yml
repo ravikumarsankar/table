@@ -4,9 +4,8 @@
 name: Publish package to npmjs
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [created]
 
 jobs:
   build:
