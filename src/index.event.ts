@@ -113,8 +113,6 @@ function contextmenuHandler(t: Table, evt: any) {
 }
 
 function keydownHandler(t: Table, evt: any) {
-  const { _emitter, _renderer } = t;
-  const { viewport } = _renderer;
   const { ctrlKey, shiftKey, metaKey, altKey, code } = evt;
   // console.log('code:', code, evt);
   let direction = null;
@@ -201,19 +199,6 @@ function keydownHandler(t: Table, evt: any) {
     selector.clearCopy(t);
   }
 
-  // Handle keydown for the currently selected cell
-  if (t._selector) {
-    const selectedCell = t._selector._currentCell;
-    const selectedRect = t._selector._currentCellRect;
-    if (viewport && selectedCell && selectedRect) {
-      _emitter.emit(
-        'key',
-        selectedCell.row,
-        selectedCell.col,
-        viewport.cellAt(selectedRect.x, selectedRect.y)
-      );
-    }
-  }
   if (direction) {
     selector.move(
       t,

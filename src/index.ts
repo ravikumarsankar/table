@@ -255,7 +255,6 @@ export default class Table {
       } else {
         this._tooltip.hide();
       }
-      this._tooltip.hide();
     });
   }
 
