@@ -170,7 +170,6 @@ export default class Table {
     this._formulas = Array()
       .fill(null)
       .map(() => Array().fill(null));
-    this._selectedCells = [];
     this._formulaParser = new FParser(this);
     // update default data
     if (options) {
@@ -249,7 +248,6 @@ export default class Table {
     });
 
     this.onSelectedCellKeydown(({ row, col, evt }) => {
-      console.log(`Keydown event on cell (${row}, ${col}):`, evt.key);
       const formula = this.getCellFormula(row, col);
       this._tooltip.hide();
     });
@@ -260,21 +258,10 @@ export default class Table {
     return this;
   }
 
-  handleSelectedCellKeydown(
-    row: number,
-    col: number,
-    evt: KeyboardEvent
-  ): void {
-    //const { key } = evt;
-    // Emit a custom event for the selected cell keydown
-    console.log(`Keydown event on `);
-    this._emitter.emit('selectedCellKeydown', { row, col, evt });
-  }
-
   onSelectedCellKeydown(
     handler: (data: { row: number; col: number; evt: KeyboardEvent }) => void
   ): Table {
-    this._emitter.on('selectedCellKeydown', handler);
+    this._emitter.on('key', handler);
     return this;
   }
 
@@ -654,6 +641,11 @@ export default class Table {
       arrays.push(a);
     });
     return arrays;
+  }
+
+  onKey(handler: (cell: ViewportCell, evt: MouseEvent) => void) {
+    this._emitter.on('key', handler);
+    return this;
   }
 
   onClick(handler: (cell: ViewportCell, evt: MouseEvent) => void) {
