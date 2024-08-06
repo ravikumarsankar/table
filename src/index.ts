@@ -463,12 +463,6 @@ export default class Table {
       return this;
     }
     const v = _cells.get(row, col);
-
-    // If in edit mode and the cell has a formula, return the formula instead of the calculated value
-    // if (this._editor && this._formulas[row][col]) {
-    //   // return this._formulas[row][col];
-    // }
-
     return v != null ? v[2] : v;
   }
 
