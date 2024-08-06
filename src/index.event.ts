@@ -31,6 +31,10 @@ function mousedownHandler(t: Table, evt: any) {
   if (_selector && viewport) {
     const { offsetX, offsetY, ctrlKey, metaKey, shiftKey } = evt;
     const vcell = viewport.cellAt(offsetX, offsetY);
+    const cellValue = t.cell(vcell?.row as number, vcell?.col as number);
+    if (!cellValue && t._restrictEmptyCellSelection) {
+      return;
+    }
     if (vcell) {
       _emitter.emit('click', vcell, evt);
       const { placement, row, col } = vcell;
