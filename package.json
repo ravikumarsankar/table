@@ -1,6 +1,6 @@
 {
   "name": "@lumel/table",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "a web-based(canvas) javascript table",
   "main": "dist/table.min.js",
   "types": "dist/index.d.ts",
