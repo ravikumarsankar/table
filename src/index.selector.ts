@@ -93,6 +93,7 @@ function addRange(t: Table, r: number, c: number, clear: boolean) {
 }
 
 function unionRange(t: Table, r: number, c: number) {
+  if (t._restrictMultiLevelSelection) return;
   const { _selector, _data } = t;
   if (_selector) {
     _selector.move(r, c).updateLastRange((focusRange) => {
@@ -362,6 +363,7 @@ function bindMousemove(
       }
     };
     const moveHandler = (e: any) => {
+      if (t._restrictMultiLevelSelection) return;
       let [x1, y1] = [0, 0];
       if (e.x > 0) x1 = e.x - left;
       if (e.y > 0) y1 = e.y - top;

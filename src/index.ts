@@ -136,6 +136,7 @@ export default class Table {
 
   _selector: Selector | null = null;
   _restrictFillRange: boolean = false;
+  _restrictMultiLevelSelection: boolean = false;
   _overlayer: Overlayer;
 
   _canvas: HElement;
